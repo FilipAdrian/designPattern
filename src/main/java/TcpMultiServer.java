@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -14,6 +17,9 @@ public class TcpMultiServer {
     static Logger logger = Logger.getLogger (TcpMultiServer.class.getName ( ));
     public static Integer numberOfPlayers = 0;
     private ServerSocket serverSocket;
+
+    static List<TcpServer> connectionList = new ArrayList<TcpServer>();
+
     TcpMultiServer(){
     }
     public void start(int port) {
@@ -21,7 +27,10 @@ public class TcpMultiServer {
         try {
             serverSocket = new ServerSocket (port);
             while (true) {
-                new TcpServer (serverSocket.accept ( )).start ( );
+
+                TcpServer myServer = new TcpServer (serverSocket.accept ( ));
+                myServer.start ( );
+                connectionList.add(myServer);
             }
         } catch (IOException e) {
             e.printStackTrace ( );
@@ -31,14 +40,16 @@ public class TcpMultiServer {
     private static class TcpServer extends Thread {
         static Logger logger = Logger.getLogger (TcpServer.class.getName ( ));
         Authentication authManager = new Authentication();
-        private Socket clientSocket;
+        public Socket clientSocket;
         private PrintWriter out;
         private BufferedReader in;
+        String ID;
 
-        public TcpServer(Socket socket) {
+        TcpServer(Socket socket) {
             this.clientSocket = socket;
             numberOfPlayers ++;
             logger.info ("New Client connected to server");
+            this.ID = authManager.getId();
         }
 
         public void run() {
@@ -54,7 +65,24 @@ public class TcpMultiServer {
                         //GET ROLE
                         out.println(authManager.getRole()); 
                         //GET ID
-                        out.println(authManager.getId());
+                        out.println(ID);
+
+                    }
+                    else if (Pattern.compile (Pattern.quote ("MAFIA: "), Pattern.CASE_INSENSITIVE).matcher (inputLine).find ( )) {
+                        inputLine = inputLine.toLowerCase ( );
+                        out.println ("You have typed Mafia");
+                        ArrayList<String> words = new ArrayList <String> (Arrays.asList (inputLine.split ("\\s+")));
+                        out.println("CHOSEN ID=" + words.get(1));
+
+                        for (int i = 0; i < TcpMultiServer.connectionList.size(); i++) {
+                            if (TcpMultiServer.connectionList.get(i).ID.equals(words.get(1))){
+
+                                TcpMultiServer.connectionList.get(i).in.close();
+                                TcpMultiServer.connectionList.get(i).out.close();
+                                TcpMultiServer.connectionList.get(i).clientSocket.close();
+
+                            }
+                        }
 
                     } else if (Pattern.compile (Pattern.quote ("stop"), Pattern.CASE_INSENSITIVE).matcher (inputLine).find ( )){
                         out.println ("Number of users : " + numberOfPlayers);
