@@ -8,9 +8,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.regex.Pattern;
 
+
 public class TcpMultiServer {
     static Logger logger = Logger.getLogger (TcpMultiServer.class.getName ( ));
-    private static String MAGIC_WORD;
+    public static Integer numberOfPlayers = 0;
     private ServerSocket serverSocket;
     TcpMultiServer(){
     }
@@ -34,6 +35,7 @@ public class TcpMultiServer {
 
         public TcpServer(Socket socket) {
             this.clientSocket = socket;
+            numberOfPlayers ++;
             logger.info ("New Client connected to server");
         }
 
@@ -44,11 +46,19 @@ public class TcpMultiServer {
                 String inputLine;
                 out.println ("Welcome To  TCP Server");
                 while ((inputLine = in.readLine ( )) != null) {
-
+                    if (Pattern.compile (Pattern.quote ("start"), Pattern.CASE_INSENSITIVE).matcher (inputLine).find ( )) {
+                        inputLine = inputLine.toLowerCase ( );
+                        out.println ("You are on server");
+                    } else if (Pattern.compile (Pattern.quote ("stop"), Pattern.CASE_INSENSITIVE).matcher (inputLine).find ( )){
+                        out.println ("Number of users : " + numberOfPlayers);
+                        out.println ("Connection was closed");
+                        break;
+                    }
                 }
                 in.close ( );
                 out.close ( );
                 clientSocket.close ( );
+                numberOfPlayers --;
                 logger.info ("Session is Finished");
             } catch (IOException e) {
                 e.printStackTrace ( );
