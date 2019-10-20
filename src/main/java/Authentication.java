@@ -28,6 +28,6 @@ class Authentication {
 
     String getId() {
         player_id++;
-        return  Integer.toString(player_id - 1);
+        return Integer.toString(player_id - 1);
     }
 }
