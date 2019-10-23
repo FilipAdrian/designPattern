@@ -8,13 +8,20 @@ import java.util.List;
 
 public class TcpMultiServer {
 
-    static Logger logger = Logger.getLogger(TcpMultiServer.class.getName());
+    private static Logger logger = Logger.getLogger(TcpMultiServer.class.getName());
     public static Integer numberOfPlayers = 0;
+    private static TcpMultiServer singleTcpServerInstance = null;
     private ServerSocket serverSocket;
-
     static List<TcpServer> connectionList = new ArrayList<TcpServer>();
 
-    TcpMultiServer() {
+    private TcpMultiServer() {
+    }
+
+    public static TcpMultiServer getInstance(){
+        if (singleTcpServerInstance == null){
+            singleTcpServerInstance = new TcpMultiServer();
+        }
+        return singleTcpServerInstance;
     }
 
     public void start(int port) {
