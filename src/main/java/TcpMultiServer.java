@@ -29,7 +29,6 @@ public class TcpMultiServer {
         try {
             serverSocket = new ServerSocket(port);
             while (true) {
-
                 TcpServer myServer = new TcpServer(serverSocket.accept());
                 myServer.start();
                 connectionList.add(myServer);

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class GameManagement {
     static Logger logger = Logger.getLogger(GameManagement.class.getName());
@@ -32,14 +33,20 @@ public class GameManagement {
             }
             logger.info(" \t <--- Game Started !  --->");
             isStarted = true;
-            logger.info("Role: " + authManager.getRole() + ", Id: " + authManager.getId());
+            logger.info("Role: " + thread.playerRole + ", Id: " + thread.ID);
         }
         else {
             logger.info("Current Number Of Players: " + TcpMultiServer.numberOfPlayers);
         }
         return isStarted;
     }
-
+ public boolean checkIfItsMafia(Integer playerId){
+        String role = TcpMultiServer.connectionList.get(playerId).playerRole;
+        if (Pattern.compile(Pattern.quote("mafia"), Pattern.CASE_INSENSITIVE).matcher(role).find()){
+            return true;
+        }
+        return false;
+ }
     public void killPlayer(String inputLine){
         out.println("You have typed Mafia");
         ArrayList<String> words = new ArrayList<String>(Arrays.asList(inputLine.split("\\s+")));
@@ -47,9 +54,6 @@ public class GameManagement {
 
         for (int i = 0; i < TcpMultiServer.connectionList.size(); i++) {
             if (TcpMultiServer.connectionList.get(i).ID.equals(words.get(1))) {
-
-//                TcpMultiServer.connectionList.get(i).in.close();
-//                TcpMultiServer.connectionList.get(i).out.close();
                 TcpMultiServer.connectionList.get(i).isStarted = false;
                 TcpServer.broadcast("Player: " + TcpMultiServer.connectionList.get(i).ID + ", died" , thread);
 

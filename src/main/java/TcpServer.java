@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class TcpServer extends Thread {
@@ -15,12 +17,14 @@ public class TcpServer extends Thread {
     private PrintWriter out;
     private BufferedReader in;
     protected String ID;
+    protected String playerRole;
 
     TcpServer(Socket socket) {
         this.clientSocket = socket;
         TcpMultiServer.numberOfPlayers++;
         logger.info("New Client connected to server");
         this.ID = authManager.getId();
+        this.playerRole = authManager.getRole();
     }
 
     public void run() {
@@ -33,7 +37,7 @@ public class TcpServer extends Thread {
                 isStarted = gameManagement.checkPlayersNumber();
                 if (isStarted) {
                     out.println(" \t <--- Game Started !  --->");
-                    out.println("Role: " + authManager.getRole() + ", Id: " + ID);
+                    out.println("Role: " + playerRole + ", Id: " + ID);
                     logger.info("Player " + ID + ": " + "started conversation");
                     break;
                 }
@@ -46,6 +50,10 @@ public class TcpServer extends Thread {
                     broadcast(serverMessage, this);
                     if (Pattern.compile(Pattern.quote("MAFIA: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
                         gameManagement.killPlayer(inputLine);
+                    } else if(Pattern.compile(Pattern.quote("COP: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()){
+                        ArrayList<String> words = new ArrayList<String>(Arrays.asList(inputLine.split("\\s+")));
+                        boolean isMafia = gameManagement.checkIfItsMafia(Integer.parseInt(words.get(1)));
+                        out.println(isMafia);
                     }
                 }
                 if (Pattern.compile(Pattern.quote("stop"), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
