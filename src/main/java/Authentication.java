@@ -1,10 +1,12 @@
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 class Authentication {
-
+    static Logger logger = Logger.getLogger(Authentication.class.getName());
     private static List<String> roleList = new ArrayList<String>() {
         {
             add("Mafia");
@@ -28,6 +30,7 @@ class Authentication {
 
     String getId() {
         player_id++;
+        logger.info("Current ID: " + player_id);
         return Integer.toString(player_id - 1);
     }
 }
