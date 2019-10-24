@@ -33,27 +33,38 @@ public class TcpServer extends Thread {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             GameManagement gameManagement = new GameManagement(out, authManager, this);
             String inputLine;
-            while (true) {
-                isStarted = gameManagement.checkPlayersNumber();
-                if (isStarted) {
-                    out.println(" \t <--- Game Started !  --->");
-                    out.println("Role: " + playerRole + ", Id: " + ID);
-                    logger.info("Player " + ID + ": " + "started conversation");
-                    break;
-                }
+
+            while (TcpMultiServer.numberOfPlayers < 3) {
+                //NOTHING
+                //out.println("WAITING FOR PLAYERS.......");
             }
 
+            out.println(" \t <--- Game Started !  --->");
+            out.println("Role: " + playerRole + ", Id: " + ID);
+            logger.info("Player " + ID + ": " + "started conversation");
+            isStarted = true;
 
             while ((inputLine = in.readLine()) != null) {
                 if (isStarted) {
-                    String serverMessage = "Player " + ID + ": " + inputLine;
-                    broadcast(serverMessage, this);
-                    if (Pattern.compile(Pattern.quote("MAFIA: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
-                        gameManagement.killPlayer(inputLine);
-                    } else if(Pattern.compile(Pattern.quote("COP: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()){
-                        ArrayList<String> words = new ArrayList<String>(Arrays.asList(inputLine.split("\\s+")));
-                        boolean isMafia = gameManagement.checkIfItsMafia(Integer.parseInt(words.get(1)));
-                        out.println(isMafia);
+
+                    if (GameManagement.isDay && GameManagement.isChatPhase) {
+                        String serverMessage = "Player " + ID + ": " + inputLine;
+                        broadcast(serverMessage, this);
+                    } else if (GameManagement.isDay) {
+                        out.println("VOTE NOW");
+                        GameManagement.votes.add(Integer.parseInt(inputLine));
+                        logger.info(Integer.parseInt(inputLine));
+                        if (GameManagement.votes.size() == TcpMultiServer.numberOfPlayers){
+                            gameManagement.VoteProcessing();
+                        }
+                    } else {
+                        if (Pattern.compile(Pattern.quote("MAFIA: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
+                            gameManagement.killPlayer(inputLine);
+                        } else if (Pattern.compile(Pattern.quote("COP: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
+                            ArrayList<String> words = new ArrayList<String>(Arrays.asList(inputLine.split("\\s+")));
+                            boolean isMafia = gameManagement.checkIfItsMafia(Integer.parseInt(words.get(1)));
+                            out.println(isMafia);
+                        }
                     }
                 }
                 if (Pattern.compile(Pattern.quote("stop"), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {

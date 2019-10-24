@@ -9,13 +9,14 @@ import java.util.List;
 public class TcpMultiServer {
 
     private static Logger logger = Logger.getLogger(TcpMultiServer.class.getName());
-    public static Integer numberOfPlayers = 0;
+    public static volatile Integer numberOfPlayers = 0;
     private static TcpMultiServer singleTcpServerInstance = null;
     private ServerSocket serverSocket;
     static List<TcpServer> connectionList = new ArrayList<TcpServer>();
 
     private TcpMultiServer() {
     }
+
 
     public static TcpMultiServer getInstance(){
         if (singleTcpServerInstance == null){
