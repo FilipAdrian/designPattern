@@ -1,4 +1,3 @@
-
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -7,6 +6,7 @@ import java.util.Random;
 
 class Authentication {
     static Logger logger = Logger.getLogger(Authentication.class.getName());
+    static int player_id;
     private static List<String> roleList = new ArrayList<String>() {
         {
             add("Mafia");
@@ -15,8 +15,6 @@ class Authentication {
             add("Cop");
         }
     };
-
-    static int player_id;
 
     String getRole() {
         if (roleList.size() != 0) {

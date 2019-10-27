@@ -6,20 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TcpMultiServer {
+public class TcpMultiServer extends Thread {
 
-    private static Logger logger = Logger.getLogger(TcpMultiServer.class.getName());
     public static volatile Integer numberOfPlayers = 0;
+    protected static ServerSocket serverSocket;
+    static List<TcpServer> connectionList = new ArrayList<>();
+    private static Logger logger = Logger.getLogger(TcpMultiServer.class.getName());
     private static TcpMultiServer singleTcpServerInstance = null;
-    private ServerSocket serverSocket;
-    static List<TcpServer> connectionList = new ArrayList<TcpServer>();
 
     private TcpMultiServer() {
     }
 
 
-    public static TcpMultiServer getInstance(){
-        if (singleTcpServerInstance == null){
+    public static TcpMultiServer getInstance() {
+        if (singleTcpServerInstance == null) {
             singleTcpServerInstance = new TcpMultiServer();
         }
         return singleTcpServerInstance;
@@ -27,6 +27,7 @@ public class TcpMultiServer {
 
     public void start(int port) {
         logger.info("TCP Multi-Server Started");
+        new GameManagement().start();
         try {
             serverSocket = new ServerSocket(port);
             while (true) {
