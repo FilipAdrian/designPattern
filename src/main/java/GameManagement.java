@@ -106,6 +106,7 @@ public class GameManagement extends Thread {
                     disconnectAllPlayer();
                 }
             } else if (role.equals("Mafia") && !isActive) {
+                logger.error("Mafia died");
                 TcpServer.broadcast(" \t <--- GAME OVER ---> \n\t <--- CITIZEN WIN --->", new TcpServer());
                 logger.info(" \t <--- GAME OVER ---> \n\t <--- CITIZEN WIN --->");
                 isStarted = false;

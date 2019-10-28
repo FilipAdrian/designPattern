@@ -1,5 +1,4 @@
 import org.apache.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class TcpServer extends Thread {
     static Logger logger = Logger.getLogger(TcpServer.class.getName());
-    public boolean isActive;
+    public boolean isActive = true;
     public Socket clientSocket;
     protected PrintWriter out;
     protected BufferedReader in;
@@ -52,11 +51,10 @@ public class TcpServer extends Thread {
             }
 
             out.println(" \t <--- Game Started !  --->");
-            out.println("\t <--- DAY --->");
             out.println("Role: " + playerRole + ", Id: " + ID);
+            out.println("\t <--- DAY --->");
             logger.info("Player " + ID + ": " + "started conversation");
             GameManagement.isStarted = true;
-            isActive = true;
 
             while ((inputLine = in.readLine()) != null) {
                 if (GameManagement.isStarted && isActive) {
@@ -76,7 +74,7 @@ public class TcpServer extends Thread {
                             gameManagement.killPlayer(Integer.parseInt(words.get(1)));
                         } else if (Pattern.compile(Pattern.quote("COP: "), Pattern.CASE_INSENSITIVE).matcher(inputLine).find()) {
                             boolean isMafia = gameManagement.checkIfItsMafia(Integer.parseInt(words.get(1)));
-                            out.println(isMafia);
+                            out.println("IS MAFIA: " + isMafia);
                         }
                     }
                 }
