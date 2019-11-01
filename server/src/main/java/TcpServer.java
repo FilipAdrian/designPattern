@@ -45,6 +45,7 @@ public class TcpServer extends Thread {
             GameManagement gameManagement = new GameManagement(this);
             String inputLine;
 // work 100% with 3 :D
+            out.println(" <--- WAITING FOR PLAYERS ... --->");
             while (TcpMultiServer.numberOfPlayers < 4) {
                 //NOTHING
                 //out.println("WAITING FOR PLAYERS.......");
@@ -63,7 +64,8 @@ public class TcpServer extends Thread {
                         String serverMessage = "Player " + ID + ": " + inputLine;
                         broadcast(serverMessage, this);
                     } else if (GameManagement.isDay) {
-                        GameManagement.votes.add(Integer.parseInt(inputLine));
+                        Integer vote = gameManagement.takeLastNumberFromString(inputLine);
+                        GameManagement.votes.add(vote);
                         logger.info(Integer.parseInt(inputLine));
                         if (GameManagement.votes.size() == TcpMultiServer.numberOfPlayers) {
                             gameManagement.VoteProcessing();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GameManagement extends Thread {
@@ -155,5 +156,20 @@ public class GameManagement extends Thread {
                 TcpServer.broadcast("Player: " + TcpMultiServer.connectionList.get(i).ID + ", died", new TcpServer());
             }
         }
+    }
+
+    public Integer takeLastNumberFromString(String str) {
+        Integer nr = 0;
+        try {
+            nr = Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            Pattern p = Pattern.compile("\\d+");
+            Matcher m = p.matcher(str);
+            while (m.find()) {
+                nr = Integer.parseInt(m.group());
+            }
+
+        }
+        return nr;
     }
 }
